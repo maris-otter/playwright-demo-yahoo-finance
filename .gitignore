@@ -16,3 +16,4 @@ playwright/.auth/ # Recommended for authenticated browser state
 
 # Temporary files
 .tmp/
+*.env
