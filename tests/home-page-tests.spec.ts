@@ -1,26 +1,25 @@
 import { test, expect } from '@playwright/test';
 import { STOCKS } from '../test-data/test-data';
 import { HomePage } from '../pages/HomePage';
-import { LoginPage } from '../pages/LoginPage';
+import { StockPage } from '../pages/StockPage';
 
 test('Stock Search', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const stockPage = new StockPage(page);
   const stock = STOCKS.REDDIT;
   await page.goto('/', {waitUntil: "commit"});
-  //await expect(page.getByRole('link', { name: 'Yahoo Finance', exact: true })).toBeVisible();
-  await expect(page.locator('#ybar-logo')).toBeVisible();
-  await page.getByRole('textbox', { name: 'Search query' }).fill(stock.searchTerm); // Pulled from test-data file
-  await page.getByRole('option', { name: stock.optionBarValue }).click();
-  await expect(page.getByTestId('quote-hdr').locator('h1')).toContainText(stock.expectedResult);
-
+  await expect(homePage.yahooLogo).toBeVisible();
+  await homePage.searchBar.fill(stock.searchTerm); // Pulled from test-data file
+  const searchOption = homePage.getOptionValue(stock.optionBarValue);
+  await searchOption.click();
+  await expect(stockPage.stockHeader).toContainText(stock.expectedResult);
 });
 
 test('Home Page Smoke', async ({ page }) => {
+  const homePage = new HomePage(page);
   await page.goto('/', {waitUntil: "commit"});
-  await expect(page.getByTestId('hero-lead-story').getByRole('list')).toBeVisible();
-  const spTsxLocator = page.getByTestId('ticker-list-item').filter({
-        has: page.getByText('S&P/TSX', { exact: true })
-    }).locator('span.symbol');
-  await expect(spTsxLocator).toBeVisible();
+  await expect(homePage.firstStory).toBeVisible();
+  await expect(homePage.getTickerByName('S&P/TSX')).toBeVisible();
 
 });
 
